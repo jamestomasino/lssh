@@ -43,11 +43,11 @@ parse_input () {
     case "$1" in
       -h)
         show_help
-        shift
+        exit 0
         ;;
       -v)
         printf "%s\\n" "$version"
-        shift
+        exit 0
         ;;
       --)
         shift
