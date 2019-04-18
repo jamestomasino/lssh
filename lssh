@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# ENV Variables Used:
-#   SSH_KEY_LOCATIONS
-#   LASTPASS_USER
-
 version="2019.04.18"
 arg_options="hv"
 key=""
@@ -112,6 +108,11 @@ main () {
   # Retrieve key from LastPass. If logged in but not recently authenticated
   # lastpass will prompt with pinentry. If no entry found, suppress error.
   password=$(lpass show --password "SSH: ${key}" 2> /dev/null)
+
+  # If the "SSH: xxx" pattern failed, try the key directly
+  if [ -n "$password" ]; then
+    password=$(lpass show --password "${key}" 2> /dev/null)
+  fi
 
   # If we found a password, apply it to the key
   if [ -n "$password" ]; then
