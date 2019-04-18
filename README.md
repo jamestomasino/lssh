@@ -1,10 +1,12 @@
 # lssh ![status](https://travis-ci.com/jamestomasino/lssh.svg?branch=master) ![license](https://img.shields.io/badge/license-GPL3-blue.svg?style=flat-square)
 
+    LSSH(1)                           General Commands Manual                          LSSH(1)
+
     NAME
            lssh - a wrapper for Lastpass CLI and ssh-agent
 
     SYNOPSIS
-           lssh [options] [ssh-key]
+           lssh [ -hv ] [ssh key name]
 
     DESRIPTION
            lssh  quickly  activates  ssh keys by name, filling passwords via Lastpass CLI, and
@@ -12,9 +14,9 @@
 
            The ssh key name provided to lssh will be used to look up both the key  itself  and
            the password for the key. If that key has a password, lssh will search Lastpass for
-           an entry named `SSH: [ssh-key]' and autofill the password with the results. If that
-           entry  is not found, `[ssh-key]' will also be attempted before giving up on a pass‐
-           word search. The key will be passed to the ssh-agent regardless.
+           an entry named `SSH: [ssh key name]' and autofill the password with the results. If
+           that  entry  is not found, `[ssh key name]' will also be attempted before giving up
+           on a password search. The key will be passed to the ssh-agent regardless.
 
     OPTIONS
            -h     Shows simple help.
@@ -39,5 +41,13 @@
            If you have an ssh key located at ~/.ssh/work/id_rsa, it can be loaded by entering:
 
            $ lssh work
+
+    DEPENDENCIES
+           lpass  The Lastpass CLI client
+
+           expect programmed dialogue with interactive programs
+
+    AUTHOR
+           James Tomasino
 
     version 2019.04.18                      18 Apr 2019                                LSSH(1)
