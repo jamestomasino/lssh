@@ -110,7 +110,7 @@ main () {
   password=$(lpass show --password "SSH: ${key}" 2> /dev/null)
 
   # If the "SSH: xxx" pattern failed, try the key directly
-  if [ -n "$password" ]; then
+  if [ -z "$password" ]; then
     password=$(lpass show --password "${key}" 2> /dev/null)
   fi
 
