@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="2019.04.19"
+version="2019.04.22"
 arg_options="hv"
 key=""
 
@@ -80,6 +80,18 @@ main () {
       break;
     fi
     if [ -d "${path}${key}" ]; then
+      # check keys in order of crypto awesomeness
+      # TODO: replace this with some listing of types or generic regex
+      if [ -f "${path}${key}/id_ed25519" ]; then
+        printf "Found key at: %s\\n" "${path}${key}/id_ed25519"
+        KEY_ID="${path}${key}/id_ed25519"
+        break;
+      fi
+      if [ -f "${path}${key}/id_dsa" ]; then
+        printf "Found key at: %s\\n" "${path}${key}/id_dsa"
+        KEY_ID="${path}${key}/id_dsa"
+        break;
+      fi
       if [ -f "${path}${key}/id_rsa" ]; then
         printf "Found key at: %s\\n" "${path}${key}/id_rsa"
         KEY_ID="${path}${key}/id_rsa"
