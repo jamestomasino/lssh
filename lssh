@@ -86,13 +86,11 @@ main () {
         printf "Found key at: %s\\n" "${path}${key}/id_ed25519"
         KEY_ID="${path}${key}/id_ed25519"
         break;
-      fi
-      if [ -f "${path}${key}/id_dsa" ]; then
+      elif [ -f "${path}${key}/id_dsa" ]; then
         printf "Found key at: %s\\n" "${path}${key}/id_dsa"
         KEY_ID="${path}${key}/id_dsa"
         break;
-      fi
-      if [ -f "${path}${key}/id_rsa" ]; then
+      elif [ -f "${path}${key}/id_rsa" ]; then
         printf "Found key at: %s\\n" "${path}${key}/id_rsa"
         KEY_ID="${path}${key}/id_rsa"
         break;
@@ -104,12 +102,6 @@ main () {
   if [ -z "$KEY_ID" ]; then
     printf "Could not find key file.\n"
     exit 1
-  fi
-
-  # If this key is already in the agent we don't need to do anything
-  if ssh-add -l | grep -q "${KEY_ID}"; then
-    printf "Key already present.\n"
-    exit 0
   fi
 
   # If not logged into lastpass, do so now
@@ -138,15 +130,6 @@ EOF
   else
     printf "Unable to get password. Activating key without password.\n"
     ssh-add -t 3600 "${KEY_ID}"
-  fi
-
-  # Double-check whether the key was added to the agent
-  if ssh-add -l | grep -q "${KEY_ID}"; then
-    printf "Key successfully activated.\n"
-    exit 0
-  else
-    printf "Found passphrase but could not activate key.\n"
-    exit 1
   fi
 }
 
