@@ -106,7 +106,7 @@ main () {
 
   # If not logged into lastpass, do so now
   if ! lpass status -q; then
-    lpass login "${LASTPASS_USER}"
+    lpass login --trust "${LASTPASS_USER}"
   fi
 
   # Retrieve key from LastPass. If logged in but not recently authenticated
