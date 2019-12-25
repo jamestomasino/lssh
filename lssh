@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="2019.04.22"
+version="2019.12.25"
 arg_options="hv"
 key=""
 
@@ -105,9 +105,15 @@ main () {
   fi
 
   # If not logged into lastpass, do so now
-  if ! lpass status -q; then
-    lpass login --trust "${LASTPASS_USER}"
-  fi
+  while ! lpass status -q; do
+    if [ -z "${LASTPASS_USER}" ]; then
+      printf "Lastpass Username: "
+      read -r lpass_user
+      lpass login --trust "${lpass_user}"
+    else
+      lpass login --trust "${LASTPASS_USER}"
+    fi
+  done
 
   # Retrieve key from LastPass. If logged in but not recently authenticated
   # lastpass will prompt with pinentry. If no entry found, suppress error.
