@@ -1,8 +1,10 @@
 #!/bin/sh
-
-version="2019.12.25"
-arg_options="hv"
+version="2020.01.17"
+arg_options="hvp:t:"
 key=""
+pattern_prefix="SSH:"
+key_locations="${HOME}/.ssh/"
+key_types="id_ed25519 id_dsa id_rsa"
 
 # Required: lpass (lastpass cli)
 if ! command -v lpass > /dev/null; then
@@ -23,6 +25,8 @@ lssh [options] [ssh-key]
 OPTIONAL FLAGS:
   -h                          Show this help
   -v                          Show current version info
+  -p [pattern prefix]         Set LastPass prefix pattern (default "SSH:")
+  -t [type]                   Set key type
 
 END
 }
@@ -45,6 +49,16 @@ parse_input () {
         printf "%s\\n" "$version"
         exit 0
         ;;
+      -p)
+        shift
+        pattern_prefix="$1"
+        shift
+        ;;
+      -t)
+        shift
+        key_types="$1"
+        shift
+        ;;
       --)
         shift
         break
@@ -62,8 +76,23 @@ parse_input () {
 }
 
 main () {
+  # Load config, overwrites hardcoded defaults
+  if [ -n "$XDG_CONFIG_HOME" ]; then
+    config="${XDG_CONFIG_HOME}/lssh/config"
+  else
+    config="${HOME}/.config/lssh/config"
+  fi
+  if [ -f "$config" ]; then
+    # shellcheck disable=SC1090
+    . "$config"
+  fi
+
+  # env vars override config file
+  key_locations="${SSH_KEY_LOCATIONS:-${key_locations}}"
+  lastpass_user="${LASTPASS_USER:-${lastpass_user}}"
+
+  # command line switches override everything
   parse_input "$@"
-  key_locations="${SSH_KEY_LOCATIONS:-$HOME/.ssh/}"
 
   if [ -z "${key}" ]; then
     printf "You need to specify a key name.\n"
@@ -81,20 +110,13 @@ main () {
     fi
     if [ -d "${path}${key}" ]; then
       # check keys in order of crypto awesomeness
-      # TODO: replace this with some listing of types or generic regex
-      if [ -f "${path}${key}/id_ed25519" ]; then
-        printf "Found key at: %s\\n" "${path}${key}/id_ed25519"
-        KEY_ID="${path}${key}/id_ed25519"
-        break;
-      elif [ -f "${path}${key}/id_dsa" ]; then
-        printf "Found key at: %s\\n" "${path}${key}/id_dsa"
-        KEY_ID="${path}${key}/id_dsa"
-        break;
-      elif [ -f "${path}${key}/id_rsa" ]; then
-        printf "Found key at: %s\\n" "${path}${key}/id_rsa"
-        KEY_ID="${path}${key}/id_rsa"
-        break;
-      fi
+      for type in $key_types; do
+        if [ -f "${path}${key}/${type}" ]; then
+          printf "Found key at: %s\\n" "${path}${key}/${type}"
+          KEY_ID="${path}${key}/${type}"
+          break;
+        fi
+      done
     fi
   done
 
@@ -106,18 +128,18 @@ main () {
 
   # If not logged into lastpass, do so now
   while ! lpass status -q; do
-    if [ -z "${LASTPASS_USER}" ]; then
+    if [ -z "${lastpass_user}" ]; then
       printf "Lastpass Username: "
       read -r lpass_user
       lpass login --trust "${lpass_user}"
     else
-      lpass login --trust "${LASTPASS_USER}"
+      lpass login --trust "${lastpass_user}"
     fi
   done
 
   # Retrieve key from LastPass. If logged in but not recently authenticated
   # lastpass will prompt with pinentry. If no entry found, suppress error.
-  password=$(lpass show --password "SSH: ${key}" 2> /dev/null)
+  password=$(lpass show --password "${pattern_prefix} ${key}" 2> /dev/null)
 
   # If the "SSH: xxx" pattern failed, try the key directly
   if [ -z "$password" ]; then
