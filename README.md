@@ -6,7 +6,7 @@
            lssh - a wrapper for Lastpass CLI and ssh-agent
 
     SYNOPSIS
-           lssh [ -hv ] [ssh key name]
+           lssh [ -hvpt ] [ssh key name]
 
     DESRIPTION
            lssh  quickly  activates  ssh keys by name, filling passwords via Lastpass CLI, and
