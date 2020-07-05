@@ -6,7 +6,7 @@
            lssh - a wrapper for Lastpass CLI and ssh-agent
 
     SYNOPSIS
-           lssh [ -hv ] [ssh key name]
+           lssh [ -hvpt ] [ssh key name]
 
     DESRIPTION
            lssh  quickly  activates  ssh keys by name, filling passwords via Lastpass CLI, and
@@ -23,7 +23,29 @@
 
            -v     Shows current version number.
 
+           -p [pattern prefix]
+                  Set LastPass prefix pattern for the title search.  The  default  pattern  is
+                  `SSH:'. If your key is named `testkey', then the default pattern will search
+                  `SSH: testkey' in LastPass for the key password.
+
+                  This is the same as setting `pattern_prefix' in the configuration file.
+
+           -t [type]
+                  Set the SSH  key  type  to  test  for.  By  default  lssh  will  search  for
+                  `id_ed25519', `id_dsa`, and `id_rsa` in that order.
+
+                  This is the same as setting `key_types' in the configuration file.
+
+    CONFIGURATION FILE
+           $XDG_CONFIG_HOME/lssh/config
+                  Configuration  settings  in  this  file will override default settings. Each
+                  setting is a string that should be written as `NAME="VALUE"'. Valid settings
+                  are `pattern_prefix', `lastpass_user', `key_locations', and `key_types'
+
     ENVIRONMENT VARIABLES
+           Environment variables will override the default settings and any configuration file
+           settings.
+
            SSH_KEY_LOCATIONS
                   List of folders containing ssh keys.
 
@@ -33,9 +55,13 @@
 
                   Unless otherwise defined, this variable defaults to ~/.ssh/
 
+                  This is the same as setting `key_locations' in the configuration file.
+
            LASTPASS_USER
                   Login username to Lastpass. This is used to initiate a login if you are  not
                   already logged in when initiating lssh
+
+                  This is the same as setting `lastpass_user' in the configuration file.
 
     EXAMPLES
            If you have an ssh key located at ~/.ssh/work/id_rsa, it can be loaded by entering:
@@ -50,4 +76,4 @@
     AUTHOR
            James Tomasino
 
-    version 2019.12.25                      25 Dec 2019                                LSSH(1)
+    version 2020.01.17                      17 Jan 2020                                LSSH(1)
