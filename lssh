@@ -1,5 +1,5 @@
 #!/bin/sh
-version="2020.01.17"
+version="2022.06.17"
 arg_options="hvp:t:"
 key=""
 pattern_prefix="SSH:"
@@ -148,12 +148,13 @@ main () {
 
   # If we found a password, apply it to the key
   if [ -n "$password" ]; then
-    # awkward tabbing due to EOF structure
+  # awkward tabbing due to EOF structure
 expect <<EOF >/dev/null
 spawn ssh-add -t 3600 ${KEY_ID}
-expect "Enter passphrase"
-send "$password\n"
-expect eof
+expect {
+  "Enter passphrase" { send "$password\r"; exp_continue }
+  eof
+}
 EOF
   else
     printf "Unable to get password. Activating key without password.\n"
